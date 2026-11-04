@@ -1,4 +1,4 @@
-package me.felek.customcapes;
+package me.eclipxia.customcapes;
 
 import org.rusherhack.client.api.RusherHackAPI;
 import org.rusherhack.client.api.plugin.Plugin;

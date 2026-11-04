@@ -1,6 +1,6 @@
-package me.felek.customcapes.mixins;
+package me.eclipxia.customcapes.mixins;
 
-import me.felek.customcapes.CustomCapeModule;
+import me.eclipxia.customcapes.CustomCapeModule;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;

@@ -1,4 +1,4 @@
-package me.felek.customcapes;
+package me.eclipxia.customcapes;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

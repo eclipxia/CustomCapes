@@ -1,5 +1,5 @@
 {
-  "Plugin-Class": "me.felek.customcapes.CustomCapes",
+  "Plugin-Class": "me.eclipxia.customcapes.CustomCapes",
   "Name": "customcapes",
   "Version": "${plugin_version}",
   "Description": "Client-side custom capes",

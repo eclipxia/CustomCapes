@@ -1,4 +1,4 @@
-package me.felek.customcapes;
+package me.eclipxia.customcapes;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;

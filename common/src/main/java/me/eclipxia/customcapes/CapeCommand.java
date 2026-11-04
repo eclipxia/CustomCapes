@@ -1,4 +1,4 @@
-package me.felek.customcapes;
+package me.eclipxia.customcapes;
 
 import net.minecraft.client.Minecraft;
 import org.rusherhack.core.command.AbstractCommand;
