@@ -1,0 +1,15 @@
+{
+  "Plugin-Class": "me.felek.customcapes.CustomCapes",
+  "Name": "customcapes",
+  "Version": "${plugin_version}",
+  "Description": "Client-side custom capes",
+  "Authors": [
+    "FelekDevYT"
+  ],
+  "Minecraft-Versions": [
+    "${minecraft_version}"
+  ],
+  "Mixin-Configs": [
+    "mixins.customcapes.json"
+  ]
+}

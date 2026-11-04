@@ -1,9 +1,14 @@
 pluginManagement {
-    repositories {
-        maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
-        gradlePluginPortal()
-    }
+	repositories {
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		gradlePluginPortal()
+	}
 }
+
+rootProject.name = 'customcapes'
+
+//one project per supported minecraft version, shared code lives in common/
+include 'versions:1.21.4', 'versions:1.21.11', 'versions:26.2'

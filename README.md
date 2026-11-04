@@ -1,43 +1,63 @@
 <h1 align="center">Custom Capes</h1>
 <p align="center">
-<b>A high-performance, client-side cosmetic extension for RusherHack.</b>
+<b>A client-side cape extension for RusherHack.</b>
 </p>
 
 ## Overview
 
-**Custom Capes** is a specialized plugin for RusherHack that allows you to customize any Minecraft cape. The plugin was designed with performance in mind.
+**Custom Capes** is a RusherHack plugin that lets you wear any cape texture, on the cape and on elytras.
+Capes can be local (only you see them) or shared through a public registry, so other players using the plugin see yours too.
 
-[!IMPORTANT]
-Client-side only: Capes will be visible only to you, other players will see your standard cape
+> [!IMPORTANT]
+> Everything is client-side. Players without this plugin keep seeing your normal cape.
+> OptiFine users cannot see these capes either: OptiFine only loads capes from its own servers.
 
-## Key Features
+Supported Minecraft versions: **1.21.4**, **1.21.11** and **26.2**.
 
-### Rendering
+## Features
 
-- **Dynamic Cape Loading:** Allows you to load capes from the plugin's folder without leaving the game.
-- **Elytra Sync:** Your texture will be visible not only on the cape, but also on the elytras
-
-### Customization
-
-- **Only for me:** This setting allows you to see the custom cape only on yourself.
-- **Real-time Selection:** Instant switching between capes directly in the module settings
+- **Dynamic cape loading:** put png files in the capes folder and load them without restarting the game.
+- **Elytra sync:** the texture is used on the cape and on elytras.
+- **Only for me:** show your selected cape only on yourself (default), or on everyone.
+- **Shared capes:** shows the capes registered in the [CustomCapes-Registry](https://github.com/eclipxia/CustomCapes-Registry), see below.
 
 ## Commands
 
-- **\*cape reload** Updates the list of available capes
+- `*cape reload` reloads local capes and the shared registry
+- `*cape uuid` prints your UUID (needed to add your cape to the registry)
 
-## How to Use
+## Using a local cape
 
-1. After the first launch, you will have a folder /rusherhack/capes/
-2. Place the cape texture into the /rusherhack/capes/ folder
-3. Enter the command **\*cape reload** in the chat to load capes from the folder
+1. After the first launch you have a `rusherhack/capes/` folder.
+2. Put your cape texture (png) in it.
+3. Run `*cape reload`, then pick the cape in the **CustomCape** module (Render category).
+
+A cape texture is the vanilla cape layout: 64x32, or a multiple of it (128x64 ... 1024x512). The outer face of the cape is the block at the top left (x1, y1, 10x16); elytras use the same texture, with the wing shape cut out by transparency.
+
+## Shared capes
+
+With **Shared Capes** enabled (default), the plugin downloads the registry index (`capes.json`, a public file) and shows each listed player's cape.
+A cape png is only downloaded the first time that player is seen. Nothing about the players around you is ever sent anywhere, the plugin only reads the registry.
+
+To get your own cape in the registry, open a pull request on [CustomCapes-Registry](https://github.com/eclipxia/CustomCapes-Registry), the steps are in its README.
+The registry URL can be changed in the module settings (https only).
 
 ## Installation
 
-1. Download the latest `.jar` from the [Releases](https://github.com/FelekDevYT/MoreHuds-rusherhack/releases/tag/1.0) page.
-2. Ensure you have the JVM flag `-Drusherhack.enablePlugins=true` added to your Minecraft launcher.
-3. Place the file into your `.minecraft/rusherhack/plugins` directory.
-4. Launch Minecraft and enable your desired HUD elements from the RusherHack HUD editor.
+1. Download the jar for your Minecraft version from the [Releases](https://github.com/eclipxia/CustomCapes/releases) page (`customcapes-<version>+mc<minecraft>.jar`).
+2. Make sure the JVM flag `-Drusherhack.enablePlugins=true` is set in your launcher.
+3. Put the jar in your `rusherhack/plugins` folder (the folder next to your Minecraft instance, not `mods`).
+4. Launch the game, or run `*reload` if it is already running.
 
-> [!WARNING]
-> This plugin is built specifically for **RusherHack v2.0.7** on **Minecraft 1.21.4**. Using it on older versions may cause instability.
+## Building
+
+Shared code lives in `common/`, version specific code (`Compat`, `MixinPlayerInfo`) in `versions/<mc>/`.
+Gradle needs Java 25.
+
+- `./gradlew buildAll` builds every version into `build/libs`
+- `./gradlew build-1.21.4`, `build-1.21.11` or `build-26.2` builds a single version
+- `./gradlew run-<mc>` starts a dev client (needs `rusherhack-loader.jar` in `lib/`; the first launch of a fresh run folder only migrates Rusherhack's folders, start it a second time to load the plugin)
+
+## Credits
+
+Original plugin by FelekDevYT.

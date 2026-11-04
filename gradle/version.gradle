@@ -1,0 +1,130 @@
+//shared build logic for every versions/<mc> project
+//expects: minecraft_version, java_version, fabric_loader_version, obfuscated (from the project's gradle.properties)
+
+def isObfuscated = project.obfuscated.toBoolean()
+
+group = rootProject.maven_group
+version = "${rootProject.plugin_version}+mc${project.minecraft_version}"
+
+//plugin jar name, e.g. customcapes-1.0.0+mc1.21.11.jar
+base {
+	archivesName = rootProject.archives_base_name
+}
+
+configurations {
+	rusherhackApi
+	rusherhackApi.canBeResolved(true)
+	compileOnly.extendsFrom(rusherhackApi)
+	productionRuntime {
+		extendsFrom configurations.minecraftLibraries
+		extendsFrom configurations.loaderLibraries
+		extendsFrom configurations.minecraftRuntimeLibraries
+	}
+}
+
+repositories {
+	maven {
+		name = "rusherhack"
+		//snapshots will always be the latest api version
+		url = "https://maven.rusherhack.org/snapshots"
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+	rusherhackApi "org.rusherhack:rusherhack-api:${project.minecraft_version}-SNAPSHOT"
+
+	if (isObfuscated) {
+		mappings loom.officialMojangMappings()
+		productionRuntime(modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}"))
+		productionRuntime("net.fabricmc:intermediary:${project.minecraft_version}")
+	} else {
+		//unobfuscated: no mappings, no remapping, no intermediary
+		productionRuntime(implementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}"))
+	}
+}
+
+loom {
+	//apply accesswidener from rusherhack-api
+	for (final def f in zipTree(this.project.configurations.rusherhackApi.singleFile)) {
+		if (f.name == "rusherhack.accesswidener") {
+			accessWidenerPath = f
+		}
+	}
+
+	//disable run configs
+	runConfigs.configureEach {
+		ideConfigGenerated = false
+	}
+}
+
+//shared sources + resources, version specific overrides live in this project's own src/main
+sourceSets {
+	main {
+		java.srcDir rootProject.file("common/src/main/java")
+		resources.srcDir rootProject.file("common/src/main/resources")
+	}
+}
+
+def targetJavaVersion = project.java_version as int
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = "UTF-8"
+	it.options.release = targetJavaVersion
+}
+
+processResources {
+	inputs.property "plugin_version", rootProject.plugin_version
+	inputs.property "minecraft_version", project.minecraft_version
+
+	filesMatching("rusherhack-plugin.json") {
+		expand(plugin_version: rootProject.plugin_version, minecraft_version: project.minecraft_version)
+	}
+}
+
+jar {
+	manifest {
+		attributes("Minecraft-Version": project.minecraft_version)
+	}
+}
+
+//the jar rusherhack loads: remapped for obfuscated versions, plain otherwise
+def pluginJar = isObfuscated ? tasks.named("remapJar") : tasks.named("jar")
+
+//no group: the root project exposes run-<mc> / build-<mc> instead
+tasks.register("copyPluginToRunDir", Copy) {
+	description = "Copy the built plugin jar into run/rusherhack/plugins"
+	dependsOn pluginJar
+	from pluginJar.flatMap { it.archiveFile }
+	into layout.projectDirectory.dir("run/rusherhack/plugins")
+}
+
+//launches the game with the rusherhack loader (put rusherhack-loader.jar in lib/, it's gitignored)
+tasks.register('runPlugin', JavaExec) {
+	description = "Start a RusherHack dev client with the plugin loaded (needs lib/rusherhack-loader.jar)"
+	dependsOn downloadAssets, copyPluginToRunDir
+	classpath.from configurations.productionRuntime
+	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
+	workingDir = layout.projectDirectory.dir("run").asFile
+
+	doFirst {
+		classpath.from loom.minecraftProvider.minecraftClientJar
+		workingDir.mkdirs()
+
+		args(
+				"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
+				"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
+				"--gameDir", workingDir.absolutePath
+		)
+
+		def loaderJar = rootProject.file("lib/rusherhack-loader.jar")
+		if (!loaderJar.exists()) {
+			throw new GradleException("rusherhack-loader.jar must be copied to the lib directory!")
+		}
+
+		jvmArgs(
+				"-Drusherhack.enablePlugins=true",
+				"-Dfabric.addMods=${loaderJar.absolutePath}",
+		)
+	}
+}
