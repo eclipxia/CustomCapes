@@ -4,6 +4,7 @@
   "Version": "${plugin_version}",
   "Description": "Client-side custom capes",
   "Authors": [
+    "eclipxia",
     "FelekDevYT"
   ],
   "Minecraft-Versions": [

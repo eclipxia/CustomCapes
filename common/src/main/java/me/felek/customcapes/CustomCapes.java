@@ -6,7 +6,7 @@ import org.rusherhack.client.api.plugin.Plugin;
 /**
  * CustomCapes plugin entry point
  *
- * @author John200410
+ * @author eclipxia (original plugin by FelekDevYT)
  */
 public class CustomCapes extends Plugin {
 	

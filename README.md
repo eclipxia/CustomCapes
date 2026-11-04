@@ -60,4 +60,4 @@ Gradle needs Java 25.
 
 ## Credits
 
-Original plugin by FelekDevYT.
+Maintained by eclipxia. Original plugin by FelekDevYT.
